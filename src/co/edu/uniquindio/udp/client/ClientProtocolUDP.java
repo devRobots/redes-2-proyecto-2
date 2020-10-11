@@ -1,5 +1,7 @@
 package co.edu.uniquindio.udp.client;
 
+import co.edu.uniquindio.udp.util.Parser;
+
 import java.io.IOException;
 import java.net.*;
 
@@ -24,19 +26,26 @@ public abstract class ClientProtocolUDP {
 
     protected void sendString(String messageToSend) throws IOException {
         byte[] ba = messageToSend.getBytes();
-
-        DatagramPacket packetToSend = new DatagramPacket(ba, ba.length, serverIPAddress, PORT);
-
-        clientSocket.send(packetToSend);
+        clientSocket.send(new DatagramPacket(ba, ba.length, serverIPAddress, PORT));
     }
 
     protected String receiveString() throws IOException {
         byte[] bufferToReceive = new byte[1024];
         DatagramPacket packetToReceive = new DatagramPacket(bufferToReceive, bufferToReceive.length);
-
         clientSocket.receive(packetToReceive);
-
         return new String(packetToReceive.getData(), 0, packetToReceive.getLength());
+    }
+
+    private void sendObject(Object o) throws IOException {
+        byte[] ba = Parser.objectToByteArray(o);
+        clientSocket.send(new DatagramPacket(ba, ba.length, serverIPAddress, PORT));
+    }
+
+    private Object receiveObject() throws IOException, ClassNotFoundException {
+        byte[] bufferToReceive = new byte[1024];
+        DatagramPacket packetToReceive = new DatagramPacket(bufferToReceive, bufferToReceive.length);
+        clientSocket.receive(packetToReceive);
+        return Parser.byteArrayToObject(bufferToReceive);
     }
 
     protected abstract void protocol();

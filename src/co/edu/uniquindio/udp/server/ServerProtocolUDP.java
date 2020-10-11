@@ -1,6 +1,7 @@
 package co.edu.uniquindio.udp.server;
 
 import co.edu.uniquindio.udp.Datagram;
+import co.edu.uniquindio.udp.util.Parser;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -44,6 +45,24 @@ public abstract class ServerProtocolUDP {
 
         DatagramPacket packetToSend = new DatagramPacket(ba, ba.length, datagram.getIpAddress(), datagram.getPort());
 
+        listener.send(packetToSend);
+    }
+
+    private Datagram<Object> receiveObject() throws IOException, ClassNotFoundException {
+        byte[] bufferToReceive = new byte[1024];
+        DatagramPacket packetToReceive = new DatagramPacket(bufferToReceive, bufferToReceive.length);
+        listener.receive(packetToReceive);
+
+        InetAddress clientIPAddress = packetToReceive.getAddress();
+        int clientPort = packetToReceive.getPort();
+        Object o = Parser.byteArrayToObject(bufferToReceive);
+
+        return new Datagram<>(o, clientIPAddress, clientPort);
+    }
+
+    private void sendObject(Datagram<Object> datagram) throws IOException {
+        byte[] ba = Parser.objectToByteArray(datagram.getData());
+        DatagramPacket packetToSend = new DatagramPacket(ba, ba.length, datagram.getIpAddress(), datagram.getPort());
         listener.send(packetToSend);
     }
 

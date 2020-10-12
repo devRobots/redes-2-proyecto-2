@@ -18,11 +18,15 @@ public class Parser {
 		return buffer;
 	}
 
-	public static Object byteArrayToObject(byte[] byteArray) throws IOException, ClassNotFoundException {
-		ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(byteArray));
-		Object o = in.readObject();
-		in.close();
+	public static Object byteArrayToObject(byte[] byteArray) throws IOException {
+		try {
+			ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(byteArray));
+			Object o = in.readObject();
+			in.close();
 
-		return o;
+			return o;
+		} catch (ClassNotFoundException ignored) {
+			return null;
+		}
 	}
 }

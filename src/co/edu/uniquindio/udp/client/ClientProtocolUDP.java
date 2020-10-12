@@ -36,17 +36,17 @@ public abstract class ClientProtocolUDP {
         return new String(packetToReceive.getData(), 0, packetToReceive.getLength());
     }
 
-    private void sendObject(Object o) throws IOException {
+    protected void sendObject(Object o) throws IOException {
         byte[] ba = Parser.objectToByteArray(o);
         clientSocket.send(new DatagramPacket(ba, ba.length, serverIPAddress, PORT));
     }
 
-    private Object receiveObject() throws IOException, ClassNotFoundException {
+    protected Object receiveObject() throws IOException, ClassNotFoundException {
         byte[] bufferToReceive = new byte[1024];
         DatagramPacket packetToReceive = new DatagramPacket(bufferToReceive, bufferToReceive.length);
         clientSocket.receive(packetToReceive);
         return Parser.byteArrayToObject(bufferToReceive);
     }
 
-    protected abstract void protocol();
+    protected abstract void protocol() throws IOException;
 }

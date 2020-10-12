@@ -15,10 +15,9 @@ public abstract class ServerProtocolUDP {
 
     public ServerProtocolUDP() {
         System.out.println("Run UDP Server...");
-
+        init();
         try {
             listener = new DatagramSocket(PORT);
-
             while (true) {
                 protocol();
             }
@@ -48,7 +47,7 @@ public abstract class ServerProtocolUDP {
         listener.send(packetToSend);
     }
 
-    private Datagram<Object> receiveObject() throws IOException, ClassNotFoundException {
+    protected Datagram<Object> receiveObject() throws IOException {
         byte[] bufferToReceive = new byte[1024];
         DatagramPacket packetToReceive = new DatagramPacket(bufferToReceive, bufferToReceive.length);
         listener.receive(packetToReceive);
@@ -60,11 +59,12 @@ public abstract class ServerProtocolUDP {
         return new Datagram<>(o, clientIPAddress, clientPort);
     }
 
-    private void sendObject(Datagram<Object> datagram) throws IOException {
+    protected void sendObject(Datagram<Object> datagram) throws IOException {
         byte[] ba = Parser.objectToByteArray(datagram.getData());
         DatagramPacket packetToSend = new DatagramPacket(ba, ba.length, datagram.getIpAddress(), datagram.getPort());
         listener.send(packetToSend);
     }
 
     protected abstract void protocol();
+    protected abstract void init();
 }

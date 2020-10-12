@@ -59,8 +59,7 @@ public class EchoUDPServer extends ServerProtocolUDP {
     private void logout(String username) {
         for (UserInformation user : users) {
             if (user.getUsername().equals(username)) {
-                System.out.println("Se ha ido el usuario " + username);
-                users.remove(user);
+                user.setActive(false);
                 return;
             }
         }

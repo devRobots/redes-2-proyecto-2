@@ -13,23 +13,23 @@ public class EchoUDPClient extends ClientProtocolUDP {
 	private String username;
 
 	@Override
-	protected void protocol() {
+	protected void protocol() throws IOException{
 		scanner = new Scanner(System.in);
 
-		try {
-			System.out.println("Conectando con el servidor...");
-			if (registro()) {
-				scanner.nextLine();
-				sendString("LOGOUT " + username);
-			} else {
-				System.out.println("INTENTOS MAXIMOS EXCEDIDOS");
+		System.out.println("Conectando con el servidor...");
+		if (login()) {
+			String message = "";
+			while (!message.contains("LOGOUT")) {
+				message = scanner.nextLine();
+				sendString(message);
 			}
+		} else {
+			System.out.println("INTENTOS MAXIMOS EXCEDIDOS");
 		}
-		catch (IOException ignored) { }
-		finally { scanner.close(); }
+		scanner.close();
 	}
 
-	private boolean registro() throws IOException {
+	private boolean login() throws IOException {
 		for (int i = 0; i < 3; i++) {
 			System.out.print("Ingrese su nombre de usuario: ");
 			String user = scanner.nextLine().trim().toUpperCase();

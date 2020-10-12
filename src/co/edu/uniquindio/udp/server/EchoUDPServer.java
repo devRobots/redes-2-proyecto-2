@@ -14,27 +14,26 @@ public class EchoUDPServer extends ServerProtocolUDP {
     }
 
     private ArrayList<UserInformation> users;
+    private int maxQueries;
 
     @Override
     protected void init() {
         users = new ArrayList<>();
+        maxQueries = 3;
     }
 
     @Override
-    protected void protocol() {
-        try {
-            Datagram<String> datagram = receiveString();
-            String message = datagram.getData();
+    protected void protocol() throws IOException{
+        Datagram<String> datagram = receiveString();
+        String message = datagram.getData();
 
-            String[] params = message.split(" ");
-            String type = params[0];
+        String[] params = message.split(" ");
+        String type = params[0];
 
-            switch (type) {
-                case "LOGIN": login(); break;
-                case "LOGOUT": logout(params[1]); break;
-                default: System.out.println(message);
-            }
-        } catch (IOException ignored) {
+        switch (type) {
+            case "LOGIN": login(); break;
+            case "LOGOUT": logout(params[1]); break;
+            default: System.out.println(message);
         }
     }
 
@@ -43,14 +42,27 @@ public class EchoUDPServer extends ServerProtocolUDP {
         InetAddress ip = username.getIpAddress();
         int port = username.getPort();
 
-        if (verifyUser(username.getData())) {
+        UserInformation user = findUser(username.getData());
+        boolean userExists = user != null;
+        if (!userExists) {
+            user = new UserInformation(username.getData());
+        }
+
+        if (!user.isActive()) {
             System.out.println("Registro del usuario: " + username.getData());
             sendString(new Datagram<>("OK", ip, port));
 
             Datagram<Object> files = receiveObject();
-            users.add(new UserInformation(username.getData(),
-                    (ArrayList<String>) files.getData(), ip, port));
             System.out.println("Archivos del usuario: " + files.getData().toString());
+
+            user.setActive(true);
+            user.setFiles((ArrayList<String>) files.getData());
+            user.setIp(ip);
+            user.setPort(port);
+
+            if (!userExists) {
+                users.add(user);
+            }
         } else {
             sendString(new Datagram<>("ERROR", ip, port));
         }
@@ -65,12 +77,12 @@ public class EchoUDPServer extends ServerProtocolUDP {
         }
     }
 
-    private boolean verifyUser(String username) {
+    private UserInformation findUser(String username) {
         for (UserInformation user : users) {
             if (user.getUsername().equals(username)) {
-                return !user.isActive();
+                return user;
             }
         }
-        return true;
+        return null;
     }
 }

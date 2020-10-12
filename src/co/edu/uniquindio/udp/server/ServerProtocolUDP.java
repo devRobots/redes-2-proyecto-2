@@ -21,9 +21,8 @@ public abstract class ServerProtocolUDP {
             while (true) {
                 protocol();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        catch (IOException ignored) { }
     }
 
     protected Datagram<String> receiveString() throws IOException {
@@ -65,6 +64,6 @@ public abstract class ServerProtocolUDP {
         listener.send(packetToSend);
     }
 
-    protected abstract void protocol();
+    protected abstract void protocol() throws IOException;
     protected abstract void init();
 }

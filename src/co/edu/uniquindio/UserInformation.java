@@ -10,12 +10,9 @@ public class UserInformation {
     private int port;
     private boolean active;
 
-    public UserInformation(String username, ArrayList<String> files, InetAddress ip, int port) {
+    public UserInformation(String username) {
         this.username = username;
-        this.files = files;
-        this.ip = ip;
-        this.port = port;
-        this.active = true;
+        this.active = false;
     }
 
     @Override

@@ -27,7 +27,7 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 	private Thread threadReceiver;
 
 	/**
-	 * Constructor del ClientNodeUDP
+	 * Sobreescritura del método protocol
 	 * @throws IOException
 	 */
 	@Override
@@ -57,6 +57,10 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 		scanner.close();
 	}
 
+	/**
+	 * Método que obtiene la información del usuario
+	 * @throws IOException
+	 */
 	private void getInfo() throws IOException {
 		sendString(username);
 		String answer = receiveString();
@@ -82,7 +86,7 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 	}
 
 	/**
-	 *
+	 * Método que asigna las consultas
 	 * @throws IOException
 	 */
 	private void setQueries() throws IOException {
@@ -97,8 +101,8 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 	}
 
 	/**
-	 *
-	 * @return
+	 * Método Login del nodo cliente en el protocolo UDP
+	 * @return Variable de control
 	 * @throws IOException
 	 */
 	private boolean login() throws IOException {
@@ -132,7 +136,7 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 	}
 
 	/**
-	 *
+	 * Método Logout de un nodo cliente en el protocolo UDP
 	 * @throws IOException
 	 */
 	private void logout() throws IOException {

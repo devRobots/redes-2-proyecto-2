@@ -9,17 +9,33 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Clase ServerIndexUDP
+ *
+ * Representa el Index UDP del servidor
+ *
+ * @author Yesid Shair Rosas Toro
+ * @author Juan David Usma Alzate
+ * @author Samara Smith Rincon Montaña
+ */
 public class ServerIndexUDP extends ServerProtocolUDP {
 
     private ArrayList<UserInformation> users;
     private int maxQueries;
 
+    /**
+     * Sobreescritura del método Init
+     */
     @Override
     protected void init() {
         users = new ArrayList<>();
         maxQueries = 3;
     }
 
+    /**
+     * Sobreescritura del método protocol
+     * @throws IOException
+     */
     @Override
     protected void protocol() throws IOException{
         Datagram<String> datagram = receiveString();
@@ -35,6 +51,11 @@ public class ServerIndexUDP extends ServerProtocolUDP {
         }
     }
 
+    /**
+     * Método para obtener la información del usuario
+     * @param params Lista de parámetros del cliente
+     * @throws IOException
+     */
     private void getInfo(String[] params) throws IOException {
         String username = receiveString().getData();
         UserInformation user = findUser(username);
@@ -51,6 +72,11 @@ public class ServerIndexUDP extends ServerProtocolUDP {
         sendString(answer);
     }
 
+    /**
+     * Método que obtiene el datagrama equivalente a un archivo
+     * @param datagram
+     * @throws IOException
+     */
     private void getFile(Datagram<String> datagram) throws IOException {
         String receiver = receiveString().getData();
         UserInformation userData = findUser(receiver);
@@ -69,11 +95,19 @@ public class ServerIndexUDP extends ServerProtocolUDP {
         users.add(userData);
     }
 
+    /**
+     * Método que crea los queries
+     * @param value
+     */
     private void setQueries(String value) {
         try { maxQueries = Integer.parseInt(value); }
         catch (Exception ignored) {}
     }
 
+    /**
+     * Método Login del servidor UDP
+     * @throws IOException
+     */
     private void login() throws IOException {
         Datagram<String> userDatagram = receiveString();
         InetAddress ip = userDatagram.getIpAddress();
@@ -110,6 +144,10 @@ public class ServerIndexUDP extends ServerProtocolUDP {
         }
     }
 
+    /**
+     * Método Logout del servidor UDP
+     * @param username
+     */
     private void logout(String username) {
         for (UserInformation user : users) {
             if (user.getUsername().equals(username)) {
@@ -119,6 +157,11 @@ public class ServerIndexUDP extends ServerProtocolUDP {
         }
     }
 
+    /**
+     * Método que obtiene la información del usuario
+     * @param username
+     * @return
+     */
     private UserInformation findUser(String username) {
         for (UserInformation user : users) {
             if (user.getUsername().equals(username)) {

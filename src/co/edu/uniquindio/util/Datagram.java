@@ -2,6 +2,15 @@ package co.edu.uniquindio.util;
 
 import java.net.InetAddress;
 
+/**
+ * Clase Datagram
+ *
+ * Clase que representa un datagrama
+ *
+ * @author Yesid Shair Rosas Toro
+ * @author Juan David Usma Alzate
+ * @author Samara Smith Rincon Montaña
+ */
 public class Datagram<T> {
     private final T data;
     private final InetAddress ipAddress;
@@ -9,6 +18,12 @@ public class Datagram<T> {
     private final Type type;
     private String[] params;
 
+    /**
+     * Método constructor del datagrama
+     * @param data          Datos del datagrama
+     * @param ipAddress     Dirección IP del datagrama
+     * @param port          Puerto
+     */
     public Datagram(T data, InetAddress ipAddress, int port) {
         this.data = data;
         this.ipAddress = ipAddress;
@@ -34,22 +49,42 @@ public class Datagram<T> {
         }
     }
 
+    /**
+     * Método que obtiene los datos del datagrama
+     * @return Datos del datagrama
+     */
     public T getData() {
         return data;
     }
 
+    /**
+     * Método que obtiene la dirección IP del datagrama
+     * @return Dirección IP del datagrama
+     */
     public InetAddress getIpAddress() {
         return ipAddress;
     }
 
+    /**
+     * Método que obtiene el puerto del datagrama
+     * @return Puerto del datagrama
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * Método que obtiene el tipo de datagrama
+     * @return Tipo de datagrama
+     */
     public Type getType() {
         return type;
     }
 
+    /**
+     * Método que obtiene los parametros del datagrama
+     * @return Parametros del datagrama
+     */
     public String[] getParams() {
         return params;
     }

@@ -30,6 +30,9 @@ public class ServerProtocolTCP extends TransferControlProtocol {
         this.userPath = userPath;
     }
 
+    /**
+     * Sobreescritura del método protocol
+     */
     @Override
     protected void protocol() {
         String fileName = receiveString();

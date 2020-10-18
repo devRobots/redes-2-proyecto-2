@@ -5,6 +5,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Clase abstracta TransferControl Protocol
+ *
+ * @author Yesid Shair Rosas Toro
+ * @author Juan David Usma Alzate
+ * @author Samara Smith Rincon Montaña
+ */
 public abstract class TransferControlProtocol {
     protected PrintWriter writer;
     protected BufferedReader reader;
@@ -15,16 +22,27 @@ public abstract class TransferControlProtocol {
     private final InputStream input;
     private final OutputStream output;
 
+    /**
+     * Método Constructor de la clase TransferControlProtocol
+     * @param input Flujo de entrada
+     * @param output Flujo de salida
+     */
     public TransferControlProtocol(InputStream input, OutputStream output) {
         this.input = input;
         this.output = output;
     }
 
+    /**
+     * Método que inicializa el stream de String
+     */
     public void initStringStreams() {
         writer = new PrintWriter(output, true);
         reader = new BufferedReader(new InputStreamReader(input));
     }
 
+    /**
+     * Método que cierra el Stream de String
+     */
     public void closeStringStreams() {
         try {
             writer.close();
@@ -33,6 +51,9 @@ public abstract class TransferControlProtocol {
         }
     }
 
+    /**
+     * Método que inicializa el flujo de archivos
+     */
     public void initFileStreams(File file, boolean sendMode) {
         try {
             if (sendMode) {
@@ -46,6 +67,9 @@ public abstract class TransferControlProtocol {
         }
     }
 
+    /**
+     * Método que cierra el flujo de archivos
+     */
     public void closeFileStreams() {
         try {
             inputFile.close();
@@ -54,11 +78,19 @@ public abstract class TransferControlProtocol {
         }
     }
 
+    /**
+     * Método que envía y escribe un mensaje String
+     * @param message Mensaje a enviar
+     */
     protected void sendString(String message) {
         writer.println(message);
         System.out.println("Mensaje enviado: " + message);
     }
 
+    /**
+     * Método que recibe y lee un mensaje String
+     * @return Mensaje recibido
+     */
     protected String receiveString() {
         String message = null;
         try {
@@ -69,6 +101,10 @@ public abstract class TransferControlProtocol {
         return message;
     }
 
+    /**
+     * Método que envía un archivo según se dirección
+     * @param filePath Dirección del archivo
+     */
     protected void sendFile(String filePath) {
         File file = new File(filePath);
         initFileStreams(file, true);
@@ -91,6 +127,10 @@ public abstract class TransferControlProtocol {
         System.out.println("Archivo enviado exitosamente");
     }
 
+    /**
+     * Método que recibe un archivo según la dirección ingresada
+     * @param filePath Dirección del archivo
+     */
     protected void receiveFile(String filePath) {
         File file = new File(filePath);
         initFileStreams(file, false);
@@ -117,6 +157,10 @@ public abstract class TransferControlProtocol {
         System.out.println("Archivo recibido exitosamente");
     }
 
+    /**
+     * Método que envía multiples archivos según una dirección ingresada
+     * @param filePath Dirección ingresada
+     */
     public void sendFiles(String filePath) {
         try{
             File dir = new File(filePath);
@@ -155,6 +199,10 @@ public abstract class TransferControlProtocol {
         }
     }
 
+    /**
+     * Método que recibe múltiples archivos según una dirección ingresada
+     * @param filePath Dirección ingresada
+     */
     public void receiveFiles(String filePath) {
         try {
             File zip = new File(filePath + File.separator + "temp.zip");

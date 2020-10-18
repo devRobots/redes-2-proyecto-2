@@ -1,16 +1,16 @@
-package co.edu.uniquindio.udp.server;
+package co.edu.uniquindio.server.udp;
 
-import co.edu.uniquindio.UserInformation;
-import co.edu.uniquindio.udp.Datagram;
+import co.edu.uniquindio.util.UserInformation;
+import co.edu.uniquindio.util.Datagram;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-public class EchoUDPServer extends ServerProtocolUDP {
+public class ServerIndexUDP extends ServerProtocolUDP {
 
     public static void main(String[] args) {
-        new EchoUDPServer();
+        new ServerIndexUDP();
     }
 
     private ArrayList<UserInformation> users;
@@ -25,16 +25,31 @@ public class EchoUDPServer extends ServerProtocolUDP {
     @Override
     protected void protocol() throws IOException{
         Datagram<String> datagram = receiveString();
-        String message = datagram.getData();
+        String[] params = datagram.getParams();
 
-        String[] params = message.split(" ");
-        String type = params[0];
-
-        switch (type) {
-            case "LOGIN": login(); break;
-            case "LOGOUT": logout(params[1]); break;
-            default: System.out.println(message);
+        switch (datagram.getType()) {
+            case LOGIN: login(); break;
+            case LOGOUT: logout(params[0]); break;
+            case SETQUERIES: setQueries(params[0]); break;
+            case GET: getFile(datagram);
+            default: System.out.println(datagram.getData());
         }
+    }
+
+    private void getFile(Datagram<String> datagram) throws IOException{
+        ArrayList<UserInformation> candidates = new ArrayList<>();
+        for (int i = 0; i < users.size() && candidates.size() < maxQueries; i++) {
+            UserInformation user = users.get(i);
+            if (user.haveFile(datagram.getParams()[0])) {
+                candidates.add(user);
+            }
+        }
+        sendObject(new Datagram<>(candidates, datagram.getIpAddress(), datagram.getPort()));
+    }
+
+    private void setQueries(String value) {
+        try { maxQueries = Integer.parseInt(value); }
+        catch (Exception ignored) { }
     }
 
     private void login() throws IOException {

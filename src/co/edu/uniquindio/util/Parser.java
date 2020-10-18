@@ -1,4 +1,4 @@
-package co.edu.uniquindio.udp.util;
+package co.edu.uniquindio.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -1,4 +1,4 @@
-package co.edu.uniquindio.udp.util;
+package co.edu.uniquindio.util;
 
 import java.io.File;
 import java.util.ArrayList;

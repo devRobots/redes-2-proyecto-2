@@ -1,13 +1,13 @@
-package co.edu.uniquindio.udp.client;
+package co.edu.uniquindio.client.udp;
 
-import co.edu.uniquindio.udp.util.Parser;
+import co.edu.uniquindio.util.Parser;
 
 import java.io.IOException;
 import java.net.*;
 
 public abstract class ClientProtocolUDP {
-    public static final int PORT = 3500;
-    public static final String SERVER = "localhost";
+    public static int PORT = 3500;
+    public static String SERVER = "localhost";
 
     private DatagramSocket clientSocket;
     private InetAddress serverIPAddress;
@@ -41,7 +41,7 @@ public abstract class ClientProtocolUDP {
         clientSocket.send(new DatagramPacket(ba, ba.length, serverIPAddress, PORT));
     }
 
-    protected Object receiveObject() throws IOException, ClassNotFoundException {
+    protected Object receiveObject() throws IOException {
         byte[] bufferToReceive = new byte[1024];
         DatagramPacket packetToReceive = new DatagramPacket(bufferToReceive, bufferToReceive.length);
         clientSocket.receive(packetToReceive);

@@ -1,7 +1,7 @@
-package co.edu.uniquindio.udp.server;
+package co.edu.uniquindio.server.udp;
 
-import co.edu.uniquindio.udp.Datagram;
-import co.edu.uniquindio.udp.util.Parser;
+import co.edu.uniquindio.util.Datagram;
+import co.edu.uniquindio.util.Parser;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

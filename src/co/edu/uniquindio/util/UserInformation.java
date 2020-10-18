@@ -1,9 +1,10 @@
-package co.edu.uniquindio;
+package co.edu.uniquindio.util;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-public class UserInformation {
+public class UserInformation implements Serializable {
     private String username;
     private ArrayList<String> files;
     private InetAddress ip;
@@ -23,6 +24,15 @@ public class UserInformation {
                 ", port=" + port +
                 ", active=" + active +
                 '}';
+    }
+
+    public boolean haveFile(String fileName) {
+        for (String file : files) {
+            if (file.equalsIgnoreCase(fileName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getUsername() {

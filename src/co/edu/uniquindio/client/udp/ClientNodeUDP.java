@@ -1,13 +1,14 @@
-package co.edu.uniquindio.udp.client;
+package co.edu.uniquindio.client.udp;
 
-import co.edu.uniquindio.udp.util.FileManager;
+import co.edu.uniquindio.util.UserInformation;
+import co.edu.uniquindio.util.FileManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class EchoUDPClient extends ClientProtocolUDP {
+public class ClientNodeUDP extends ClientProtocolUDP {
 
 	private Scanner scanner;
 	private String username;
@@ -22,11 +23,22 @@ public class EchoUDPClient extends ClientProtocolUDP {
 			while (!message.contains("LOGOUT")) {
 				message = scanner.nextLine();
 				sendString(message);
+
+				switch (message.split(" ")[0]) {
+					case "GET": getFile();
+				}
 			}
 		} else {
 			System.out.println("INTENTOS MAXIMOS EXCEDIDOS");
 		}
 		scanner.close();
+	}
+
+	private void getFile() throws IOException {
+		ArrayList<UserInformation> candidates = (ArrayList<UserInformation>) receiveObject();
+		for (UserInformation candidate : candidates) {
+			
+		}
 	}
 
 	private boolean login() throws IOException {
@@ -40,11 +52,11 @@ public class EchoUDPClient extends ClientProtocolUDP {
 
 			if (response.equals("OK")) {
 				System.out.println("Cliente conectado!");
+
 				System.out.println("Sincronizando archivos...");
+				ArrayList<String> archivos = FileManager.listFiles(user.toLowerCase() + File.separator + "Compartida");
 
-				ArrayList<String> archivos = FileManager.listFiles(user + File.separator + "Compartida");
 				sendObject(archivos);
-
 				System.out.println("Archivos sincronizados!");
 
 				username = user;
@@ -58,6 +70,6 @@ public class EchoUDPClient extends ClientProtocolUDP {
 	}
 
 	public static void main(String[] args) {
-		new EchoUDPClient();
+		new ClientNodeUDP();
 	}
 }

@@ -10,12 +10,26 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Clase ClientNodeUDP
+ *
+ * Representa el cliente del modelo cliente-servidor
+ *
+ * @author Yesid Shair Rosas Toro
+ * @author Juan David Usma Alzate
+ * @author Samara Smith Rincon Montaña
+ */
+
 public class ClientNodeUDP extends ClientProtocolUDP {
 
 	private Scanner scanner;
 	private String username;
 	private Thread threadReceiver;
 
+	/**
+	 * Constructor del ClientNodeUDP
+	 * @throws IOException
+	 */
 	@Override
 	protected void protocol() throws IOException {
 		scanner = new Scanner(System.in);
@@ -49,6 +63,11 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 		System.out.println(answer);
 	}
 
+	/**
+	 *
+	 * @param fileName
+	 * @throws IOException
+	 */
 	private void getFile(String fileName) throws IOException {
 		sendString(username);
 		ArrayList<UserInformation> candidates = (ArrayList<UserInformation>) receiveObject();
@@ -62,6 +81,10 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 		}
 	}
 
+	/**
+	 *
+	 * @throws IOException
+	 */
 	private void setQueries() throws IOException {
 		System.out.print("Ingrese el maximo de queries: ");
 		int n = Integer.parseInt(scanner.nextLine());
@@ -73,6 +96,11 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 		}
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws IOException
+	 */
 	private boolean login() throws IOException {
 		for (int i = 0; i < 3; i++) {
 			System.out.print("Ingrese su nombre de usuario: ");
@@ -103,6 +131,10 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 		return false;
 	}
 
+	/**
+	 *
+	 * @throws IOException
+	 */
 	private void logout() throws IOException {
 		sendString("LOGOUT " + username);
 		threadReceiver.interrupt();

@@ -4,10 +4,27 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * Clase ServerSenderTCP
+ *
+ * Representa el remitente para el servidor destino
+ *
+ * @author Yesid Shair Rosas Toro
+ * @author Juan David Usma Alzate
+ * @author Samara Smith Rincon Montaña
+ */
+
 public class ServerSenderTCP {
     private ServerSocket listener;
     private Socket serverSideSocket;
     private ServerProtocolTCP serverProtocolTCP;
+
+    /**
+     * Constructor del ServerSenderTCP
+     *
+     * @param port          Puerto de la red
+     * @param username      nombre del usuario
+     */
 
      public ServerSenderTCP(int port, String username) {
          try {

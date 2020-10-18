@@ -31,6 +31,9 @@ public class ClientProtocolTCP extends TransferControlProtocol {
         this.userPath = userPath;
     }
 
+    /**
+     * Sobreescritura del método protocol
+     */
     @Override
     protected void protocol() {
         String[] splitPath = userPath.split(File.separator);

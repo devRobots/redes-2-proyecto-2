@@ -20,6 +20,7 @@ public abstract class ClientProtocolUDP {
             protocol();
 
             clientSocket.close();
+            System.exit(0);
         } catch (IOException ignored) {
         }
     }

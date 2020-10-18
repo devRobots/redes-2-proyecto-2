@@ -30,9 +30,9 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 				String[] data = message.split(" ");
 
 				switch (data[0]) {
+					case "SETQUERIES": setQueries(); break;
 					case "GET": getFile(data[1]); break;
-					case "INFO": break;
-					case "SETQUERIES": setQueries();
+					case "INFO": getInfo(); break;
 					default: System.out.println(message + ": No es un comando valido");
 				}
 			}
@@ -43,7 +43,14 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 		scanner.close();
 	}
 
+	private void getInfo() throws IOException {
+		sendString(username);
+		String answer = receiveString();
+		System.out.println(answer);
+	}
+
 	private void getFile(String fileName) throws IOException {
+		sendString(username);
 		ArrayList<UserInformation> candidates = (ArrayList<UserInformation>) receiveObject();
 		for (UserInformation candidate : candidates) {
 			String s = File.separator;
@@ -99,6 +106,7 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 	private void logout() throws IOException {
 		sendString("LOGOUT " + username);
 		threadReceiver.interrupt();
+		System.out.println("Adios");
 	}
 
 }

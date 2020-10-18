@@ -1,11 +1,13 @@
 package co.edu.uniquindio.server.udp;
 
+import co.edu.uniquindio.util.Request;
 import co.edu.uniquindio.util.UserInformation;
 import co.edu.uniquindio.util.Datagram;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ServerIndexUDP extends ServerProtocolUDP {
 
@@ -27,12 +29,33 @@ public class ServerIndexUDP extends ServerProtocolUDP {
             case LOGIN: login(); break;
             case LOGOUT: logout(params[0]); break;
             case SETQUERIES: setQueries(params[0]); break;
-            case GET: getFile(datagram);
+            case GET: getFile(datagram); break;
+            case INFO: getInfo(params); break;
             default: System.out.println(datagram.getData());
         }
     }
 
+    private void getInfo(String[] params) throws IOException {
+        String username = receiveString().getData();
+        UserInformation user = findUser(username);
+
+        String message = "Result: ";
+        switch (params[0]) {
+            case "REQUESTS": message += user.getRequestsNumber() + ""; break;
+            case "FILE": message += user.getRequestsNumber(params[1]) + "";break;
+            case "REJECTEDS": message += user.getRejectedRequests() + ""; break;
+            default: System.out.println("No se reconocio: " + Arrays.toString(params)); break;
+        }
+
+        Datagram<String> answer = new Datagram<>(message, user.getIp(), user.getPort());
+        sendString(answer);
+    }
+
     private void getFile(Datagram<String> datagram) throws IOException {
+        String receiver = receiveString().getData();
+        UserInformation userData = findUser(receiver);
+        users.remove(userData);
+
         ArrayList<UserInformation> candidates = new ArrayList<>();
         for (int i = 0; i < users.size() && candidates.size() < maxQueries; i++) {
             UserInformation user = users.get(i);
@@ -40,7 +63,10 @@ public class ServerIndexUDP extends ServerProtocolUDP {
                 candidates.add(user);
             }
         }
+
+        userData.addRequest(new Request(candidates, datagram.getData()));
         sendObject(new Datagram<>(candidates, datagram.getIpAddress(), datagram.getPort()));
+        users.add(userData);
     }
 
     private void setQueries(String value) {

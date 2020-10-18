@@ -7,16 +7,19 @@ public class ClientReceiverTCP {
     private Socket clientSideSocket;
     private ClientProtocolTCP clientProtocolTCP;
 
-    public ClientReceiverTCP(String server, int port) {
+    public ClientReceiverTCP(String server, int port, String filePath) {
         try {
-            clientSideSocket = new Socket(server, port);
-
-            clientProtocolTCP = new ClientProtocolTCP(clientSideSocket.getInputStream(), clientSideSocket.getOutputStream());
+            clientSideSocket = new Socket(server.substring(1), port);
+            clientProtocolTCP = new ClientProtocolTCP(
+                    clientSideSocket.getInputStream(),
+                    clientSideSocket.getOutputStream(),
+                    filePath);
             clientProtocolTCP.initStringStreams();
             clientProtocolTCP.protocol();
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
+            assert clientProtocolTCP != null;
             clientProtocolTCP.closeStringStreams();
             try {
                 assert clientSideSocket != null;

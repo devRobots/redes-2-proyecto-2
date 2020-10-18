@@ -1,30 +1,30 @@
-package co.edu.uniquindio.server.tcp;
+package co.edu.uniquindio.client.tcp;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerSenderTCP {
-    public static final int PORT = 3400;
-
     private ServerSocket listener;
     private Socket serverSideSocket;
     private ServerProtocolTCP serverProtocolTCP;
 
-     public ServerSenderTCP() {
+     public ServerSenderTCP(int port, String username) {
          try {
-             listener = new ServerSocket(PORT);
+             listener = new ServerSocket(port);
+             System.out.println("SERVIDOR TCP INICIADO");
 
              while (true) {
-                 System.out.println("The ECHO TCP SERVER is waiting for a client...");
                  serverSideSocket = listener.accept();
+                 System.out.println("Conectando con cliente...");
 
                  try {
-                     serverProtocolTCP = new ServerProtocolTCP(serverSideSocket.getInputStream(), serverSideSocket.getOutputStream());
+                     serverProtocolTCP = new ServerProtocolTCP(
+                             username + File.separator + "Compartida",
+                             serverSideSocket.getInputStream(),
+                             serverSideSocket.getOutputStream());
                      serverProtocolTCP.initStringStreams();
                      serverProtocolTCP.protocol();
-                     System.out.println();
-                     throw new Exception();
                  } catch (Exception ex) {
                      System.out.println(ex.getMessage());
                  } finally {

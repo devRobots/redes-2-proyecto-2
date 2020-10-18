@@ -9,10 +9,6 @@ import java.util.ArrayList;
 
 public class ServerIndexUDP extends ServerProtocolUDP {
 
-    public static void main(String[] args) {
-        new ServerIndexUDP();
-    }
-
     private ArrayList<UserInformation> users;
     private int maxQueries;
 
@@ -36,7 +32,7 @@ public class ServerIndexUDP extends ServerProtocolUDP {
         }
     }
 
-    private void getFile(Datagram<String> datagram) throws IOException{
+    private void getFile(Datagram<String> datagram) throws IOException {
         ArrayList<UserInformation> candidates = new ArrayList<>();
         for (int i = 0; i < users.size() && candidates.size() < maxQueries; i++) {
             UserInformation user = users.get(i);
@@ -49,23 +45,28 @@ public class ServerIndexUDP extends ServerProtocolUDP {
 
     private void setQueries(String value) {
         try { maxQueries = Integer.parseInt(value); }
-        catch (Exception ignored) { }
+        catch (Exception ignored) {}
     }
 
     private void login() throws IOException {
-        Datagram<String> username = receiveString();
-        InetAddress ip = username.getIpAddress();
-        int port = username.getPort();
+        Datagram<String> userDatagram = receiveString();
+        InetAddress ip = userDatagram.getIpAddress();
+        int port = userDatagram.getPort();
 
-        UserInformation user = findUser(username.getData());
+        UserInformation user = findUser(userDatagram.getData());
         boolean userExists = user != null;
         if (!userExists) {
-            user = new UserInformation(username.getData());
+            user = new UserInformation(userDatagram.getData());
         }
 
         if (!user.isActive()) {
-            System.out.println("Registro del usuario: " + username.getData());
+            System.out.println("Registro del usuario: " + userDatagram.getData());
             sendString(new Datagram<>("OK", ip, port));
+
+            sendString(new Datagram<>(
+                    userDatagram.getPort() + "",
+                    userDatagram.getIpAddress(),
+                    userDatagram.getPort()));
 
             Datagram<Object> files = receiveObject();
             System.out.println("Archivos del usuario: " + files.getData().toString());

@@ -18,4 +18,9 @@ public class FileManager {
         }
         return files;
     }
+
+    public static boolean verifyFile(String filePath) {
+        File file = new File(filePath);
+        return file.isFile();
+    }
 }

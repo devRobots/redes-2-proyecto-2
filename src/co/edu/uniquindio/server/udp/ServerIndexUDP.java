@@ -44,7 +44,7 @@ public class ServerIndexUDP extends ServerProtocolUDP {
         switch (datagram.getType()) {
             case LOGIN: login(); break;
             case LOGOUT: logout(params[0]); break;
-            case SETQUERIES: setQueries(params[0]); break;
+            case SETQUERIES: setQueries(); break;
             case GET: getFile(datagram); break;
             case INFO: getInfo(params); break;
             default: System.out.println(datagram.getData());
@@ -96,11 +96,10 @@ public class ServerIndexUDP extends ServerProtocolUDP {
     }
 
     /**
-     * Método que crea los queries
-     * @param value
+     * Método que cambia la cantiad de los queries
      */
-    private void setQueries(String value) {
-        try { maxQueries = Integer.parseInt(value); }
+    private void setQueries() {
+        try { maxQueries = Integer.parseInt(receiveString().getData()); }
         catch (Exception ignored) {}
     }
 

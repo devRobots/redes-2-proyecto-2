@@ -36,8 +36,8 @@ public class ClientProtocolTCP extends TransferControlProtocol {
      */
     @Override
     protected void protocol() {
-        String[] splitPath = userPath.split(File.separator);
-        String fileName = splitPath[splitPath.length-1];
+        String aux = File.separator;
+        String fileName = userPath.substring(userPath.lastIndexOf(aux)+1);
         sendString(fileName);
         receiveFile("files" + File.separator + userPath);
     }

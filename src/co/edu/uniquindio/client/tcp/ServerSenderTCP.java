@@ -29,11 +29,11 @@ public class ServerSenderTCP {
      public ServerSenderTCP(int port, String username) {
          try {
              listener = new ServerSocket(port);
-             System.out.println("SERVIDOR TCP INICIADO");
+             System.out.println("Servidor TCP de envios iniciado");
 
              while (true) {
                  serverSideSocket = listener.accept();
-                 System.out.println("Conectando con cliente...");
+                 System.out.println("Iniciando  envio...");
 
                  try {
                      serverProtocolTCP = new ServerProtocolTCP(

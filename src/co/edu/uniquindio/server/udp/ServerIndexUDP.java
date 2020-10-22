@@ -34,7 +34,7 @@ public class ServerIndexUDP extends ServerProtocolUDP {
 
     /**
      * Sobreescritura del método protocol
-     * @throws IOException
+     * @throws IOException ex
      */
     @Override
     protected void protocol() throws IOException{
@@ -47,49 +47,64 @@ public class ServerIndexUDP extends ServerProtocolUDP {
             case SETQUERIES: setQueries(); break;
             case GET: getFile(datagram); break;
             case INFO: getInfo(params); break;
-            default: System.out.println(datagram.getData());
+            default: System.out.println("Comando no reconocido: " + datagram.getData());
         }
     }
 
     /**
      * Método para obtener la información del usuario
      * @param params Lista de parámetros del cliente
-     * @throws IOException
+     * @throws IOException ex
      */
     private void getInfo(String[] params) throws IOException {
+        System.out.println("==[INFO]=======================");
+
         String username = receiveString().getData();
         UserInformation user = findUser(username);
+        assert user != null;
 
-        String message = "Result: ";
+        System.out.println("Usuario solicitante: " + username);
+        System.out.println("Tipo de Consulta: " + params[0]);
+
+        String message = "Respuesta: ";
         switch (params[0]) {
             case "REQUESTS": message += user.getRequestsNumber() + ""; break;
             case "FILE": message += user.getRequestsNumber(params[1]) + "";break;
             case "REJECTEDS": message += user.getRejectedRequests() + ""; break;
-            default: System.out.println("No se reconocio: " + Arrays.toString(params)); break;
+            default: System.out.println("Parametros no reconocidos: " + Arrays.toString(params)); break;
         }
 
+        System.out.println(message);
         Datagram<String> answer = new Datagram<>(message, user.getIp(), user.getPort());
         sendString(answer);
     }
 
     /**
      * Método que obtiene el datagrama equivalente a un archivo
-     * @param datagram
-     * @throws IOException
+     * @param datagram datagram
+     * @throws IOException ex
      */
     private void getFile(Datagram<String> datagram) throws IOException {
+        System.out.println("==[GET]========================");
         String receiver = receiveString().getData();
         UserInformation userData = findUser(receiver);
+        assert userData != null;
         users.remove(userData);
+
+        System.out.println("Usuario solicitante: " + receiver);
+        System.out.println("Archivo  solicitado: " + datagram.getParams()[0]);
 
         ArrayList<UserInformation> candidates = new ArrayList<>();
         for (int i = 0; i < users.size() && candidates.size() < maxQueries; i++) {
             UserInformation user = users.get(i);
-            if (user.haveFile(datagram.getParams()[0])) {
+            if (user.haveFile(datagram.getParams()[0]) && !user.equals(userData) && user.isActive()) {
+                System.out.print("Se encontro en el peer: " + user.getUsername());
+                System.out.println(" (" + user.getIp().getHostAddress() + ":" + user.getPort() + ")");
                 candidates.add(user);
             }
         }
 
+        System.out.println("Peers encontrados: " + candidates.size());
         userData.addRequest(new Request(candidates, datagram.getData()));
         sendObject(new Datagram<>(candidates, datagram.getIpAddress(), datagram.getPort()));
         users.add(userData);
@@ -98,14 +113,19 @@ public class ServerIndexUDP extends ServerProtocolUDP {
     /**
      * Método que cambia la cantiad de los queries
      */
-    private void setQueries() {
+    private void setQueries() throws IOException{
+        System.out.println("==[SETQUERIES]=================");
+        String username = receiveString().getData();
+        System.out.println("Usuario modificador: " + username);
+        System.out.println("Valor anterior: " + maxQueries);
         try { maxQueries = Integer.parseInt(receiveString().getData()); }
         catch (Exception ignored) {}
+        System.out.println("Valor nuevo: " + maxQueries);
     }
 
     /**
      * Método Login del servidor UDP
-     * @throws IOException
+     * @throws IOException ex
      */
     private void login() throws IOException {
         Datagram<String> userDatagram = receiveString();
@@ -119,16 +139,16 @@ public class ServerIndexUDP extends ServerProtocolUDP {
         }
 
         if (!user.isActive()) {
-            System.out.println("Registro del usuario: " + userDatagram.getData());
+            System.out.println("==[LOGIN]======================");
+            System.out.println("Nombre del usuario: " + userDatagram.getData());
             sendString(new Datagram<>("OK", ip, port));
 
-            sendString(new Datagram<>(
-                    userDatagram.getPort() + "",
-                    userDatagram.getIpAddress(),
-                    userDatagram.getPort()));
+            sendString(new Datagram<>(userDatagram.getPort() + "", ip, port));
 
             Datagram<Object> files = receiveObject();
             System.out.println("Archivos del usuario: " + files.getData().toString());
+            System.out.println("Direccion IP: " + ip.getHostAddress());
+            System.out.println("Puerto: " + port);
 
             user.setActive(true);
             user.setFiles((ArrayList<String>) files.getData());
@@ -145,11 +165,13 @@ public class ServerIndexUDP extends ServerProtocolUDP {
 
     /**
      * Método Logout del servidor UDP
-     * @param username
+     * @param username username
      */
     private void logout(String username) {
         for (UserInformation user : users) {
             if (user.getUsername().equals(username)) {
+                System.out.println("==[LOGOUT]=====================");
+                System.out.println("Se ha ido el usuario: " + username);
                 user.setActive(false);
                 return;
             }
@@ -158,8 +180,8 @@ public class ServerIndexUDP extends ServerProtocolUDP {
 
     /**
      * Método que obtiene la información del usuario
-     * @param username
-     * @return
+     * @param username username
+     * @return user
      */
     private UserInformation findUser(String username) {
         for (UserInformation user : users) {

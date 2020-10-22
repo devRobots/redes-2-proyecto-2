@@ -16,7 +16,7 @@ import java.io.*;
 
 public class ClientProtocolTCP extends TransferControlProtocol {
 
-    private String userPath;
+    private final String userPath;
 
     /**
      * Constructor del ClienteProtocolTCP

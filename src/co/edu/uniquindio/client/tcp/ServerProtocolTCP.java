@@ -16,7 +16,7 @@ import java.io.*;
 
 public class ServerProtocolTCP extends TransferControlProtocol {
 
-    private String userPath;
+    private final String userPath;
 
     /**
      * Constructor del ServerProtocolTCP
@@ -36,6 +36,7 @@ public class ServerProtocolTCP extends TransferControlProtocol {
     @Override
     protected void protocol() {
         String fileName = receiveString();
-        sendFile("files" + File.separator + userPath + File.separator + fileName);
+        String filePath = "files" + File.separator + userPath + File.separator + fileName;
+        sendFile(filePath);
     }
 }

@@ -28,7 +28,7 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 
 	/**
 	 * Sobreescritura del método protocol
-	 * @throws IOException
+	 * @throws IOException ex
 	 */
 	@Override
 	protected void protocol() throws IOException {
@@ -37,16 +37,16 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 		System.out.println("Conectando con el servidor...");
 		if (login()) {
 			while (true) {
+				System.out.println();
 				String message = scanner.nextLine();
-				if (message.equals("LOGOUT")) { logout(); break; }
-				sendString(message);
 
+				if (message.equals("LOGOUT")) { logout(); break; }
 				String[] data = message.split(" ");
 
 				switch (data[0]) {
 					case "SETQUERIES": setQueries(); break;
-					case "GET": getFile(data[1]); break;
-					case "INFO": getInfo(); break;
+					case "GET": sendString(message); getFile(data[1]); break;
+					case "INFO": sendString(message); getInfo(); break;
 					default: System.out.println(message + ": No es un comando valido");
 				}
 			}
@@ -54,12 +54,13 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 			System.out.println("INTENTOS MAXIMOS EXCEDIDOS");
 		}
 
+		System.out.println("Cerrando cliente...");
 		scanner.close();
 	}
 
 	/**
 	 * Método que obtiene la información del usuario
-	 * @throws IOException
+	 * @throws IOException ex
 	 */
 	private void getInfo() throws IOException {
 		sendString(username);
@@ -68,42 +69,59 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 	}
 
 	/**
-	 *
-	 * @param fileName
-	 * @throws IOException
+	 * Metodo que obtiene un archivo desde un peer
+	 * @param fileName file
+	 * @throws IOException ex
 	 */
 	private void getFile(String fileName) throws IOException {
+		System.out.println("==[GET]========================");
 		sendString(username);
+
+		System.out.println("Actualizando indice de archivos...");
 		ArrayList<UserInformation> candidates = (ArrayList<UserInformation>) receiveObject();
+		System.out.println("Cantidatos encontrados: " + candidates.size());
+		System.out.println("-------------------------------");
+
 		for (UserInformation candidate : candidates) {
+			System.out.print("Conectando con el peer: ");
+			System.out.println(candidate.getIp().getHostAddress() + ":" + candidate.getPort());
+
 			String s = File.separator;
 			String filePath = username + s + "Descargas" + s + fileName;
-			new ClientReceiverTCP(candidate.getIp().toString(), candidate.getPort(), filePath);
+			new ClientReceiverTCP(candidate.getIp().getHostAddress(), candidate.getPort(), filePath);
 			if (FileManager.verifyFile(filePath)) {
-				break;
+				System.out.println("Archivo obtenido exitosamente");
+				return;
 			}
 		}
+		System.out.println("Archivo no encontrado");
 	}
 
 	/**
 	 * Método que asigna las consultas
-	 * @throws IOException
 	 */
-	private void setQueries() throws IOException {
+	private void setQueries() {
+		System.out.println("==[SETQUERIES]=================");
 		System.out.print("Ingrese el maximo de queries: ");
-		int n = Integer.parseInt(scanner.nextLine());
-		if (n > 0) {
-			sendString("QUERIES " + n);
-			System.out.println("OK");
-		} else {
-			System.out.println("ERROR");
+		String input = scanner.nextLine();
+		try {
+			int n = Integer.parseInt(input);
+			if (n > 0) {
+				sendString("SETQUERIES");
+				sendString(username);
+				sendString(n + "");
+			} else {
+				System.out.println("El valor " + input + " debe ser positivo");
+			}
+		} catch (IOException ignored) {
+			System.out.println("No se reconocio el numero: " + input);
 		}
 	}
 
 	/**
 	 * Método Login del nodo cliente en el protocolo UDP
 	 * @return Variable de control
-	 * @throws IOException
+	 * @throws IOException ex
 	 */
 	private boolean login() throws IOException {
 		for (int i = 0; i < 3; i++) {
@@ -115,7 +133,8 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 			String response = receiveString();
 
 			if (response.equals("OK")) {
-				System.out.println("Cliente conectado!");
+				System.out.println();
+				System.out.println("==[LOGIN]======================");
 
 				int port = Integer.parseInt(receiveString());
 				threadReceiver = new Thread(() -> new ServerSenderTCP(port, username));
@@ -125,7 +144,7 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 				ArrayList<String> archivos = FileManager.listFiles(username.toLowerCase() + File.separator + "Compartida");
 
 				sendObject(archivos);
-				System.out.println("Archivos sincronizados!");
+				System.out.println("Archivos sincronizados");
 
 				return true;
 			} else {
@@ -137,12 +156,14 @@ public class ClientNodeUDP extends ClientProtocolUDP {
 
 	/**
 	 * Método Logout de un nodo cliente en el protocolo UDP
-	 * @throws IOException
+	 * @throws IOException ex
 	 */
 	private void logout() throws IOException {
+		System.out.println("==[LOGOUT]=====================");
 		sendString("LOGOUT " + username);
+		System.out.println("Deteniendo servidor TCP de envios...");
 		threadReceiver.interrupt();
-		System.out.println("Adios");
+		System.out.println("Adios " + username);
 	}
 
 }

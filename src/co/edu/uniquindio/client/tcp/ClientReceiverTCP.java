@@ -27,7 +27,7 @@ public class ClientReceiverTCP {
 
     public ClientReceiverTCP(String server, int port, String filePath) {
         try {
-            clientSideSocket = new Socket(server.substring(1), port);
+            clientSideSocket = new Socket(server, port);
             clientProtocolTCP = new ClientProtocolTCP(
                     clientSideSocket.getInputStream(),
                     clientSideSocket.getOutputStream(),
